@@ -90,11 +90,40 @@ func main() {
 		log.Fatal("ERROR OPENING WEBSOCKET: ", err)
 	}
 
+	// // Making a map of registered commands.
+	registeredCommands := make([]*discordgo.ApplicationCommand, len(commandMap))
+
+	// Looping through the commands array and registering them.
+	// https://pkg.go.dev/github.com/bwmarrin/discordgo#Session.ApplicationCommandCreate
+	for i, command := range commandMap {
+		registeredCommand, err := session.ApplicationCommandCreate(session.State.User.ID, "1083175428073738432", command)
+		if err != nil {
+			log.Printf("CANNOT CREATE '%v' COMMAND: %v", command.Name, err)
+		}
+
+		registeredCommands[i] = registeredCommand
+	}
+
+	// Looping through the array of interaction handlers and adding them to the session.
+	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+		if handler, ok := commandHandlers[interaction.ApplicationCommandData().Name]; ok {
+			handler(session, interaction)
+		}
+	})
+
 	// Wait here until CTRL-C or other term signal is received.
 	log.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
+
+	// // Lopping through the registeredCommands array and deleting all the commands.
+	for _, v := range registeredCommands {
+		err := session.ApplicationCommandDelete(session.State.User.ID, "1001077854936760352", v.ID)
+		if err != nil {
+			log.Printf("CANNOT DELETE '%v' COMMAND: %v", v.Name, err)
+		}
+	}
 
 	// Cleanly close the Discord session.
 	session.Close()
