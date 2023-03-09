@@ -117,13 +117,13 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	// // Lopping through the registeredCommands array and deleting all the commands.
-	for _, v := range registeredCommands {
-		err := session.ApplicationCommandDelete(session.State.User.ID, "1001077854936760352", v.ID)
-		if err != nil {
-			log.Printf("CANNOT DELETE '%v' COMMAND: %v", v.Name, err)
-		}
-	}
+	//// // Lopping through the registeredCommands array and deleting all the commands.
+	//for _, v := range registeredCommands {
+	//	err := session.ApplicationCommandDelete(session.State.User.ID, "1001077854936760352", v.ID)
+	//	if err != nil {
+	//		log.Printf("CANNOT DELETE '%v' COMMAND: %v", v.Name, err)
+	//	}
+	//}
 
 	// Cleanly close the Discord session.
 	session.Close()

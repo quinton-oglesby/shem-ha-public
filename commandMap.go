@@ -36,6 +36,66 @@ var commandMap = []*discordgo.ApplicationCommand{
 			},
 		},
 	},
+	{
+		Name:                     "setup",
+		Description:              "This command prepares Shem-Ha for use in your server. This must be run first!",
+		DefaultMemberPermissions: &defaultMemberPermissions,
+	},
+	{
+		Name:                     "chat_list_channels",
+		Description:              "This command lists the channels Shem-Ha is allowed to respond in.",
+		DefaultMemberPermissions: &defaultMemberPermissions,
+	},
+	{
+		Name:                     "chat_add_channel",
+		Description:              "This command adds a channel to the list that Shem-Ha is allowed to chat in.",
+		DefaultMemberPermissions: &defaultMemberPermissions,
+
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionChannel,
+				Name:        "channel",
+				Description: "The channel that you want to add to the list of approved channels.",
+				Required:    true,
+			},
+		},
+	},
+	{
+		Name:                     "chat_remove_channel",
+		Description:              "This command removes a channel to the list that Shem-Ha is allowed to chat in.",
+		DefaultMemberPermissions: &defaultMemberPermissions,
+
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionChannel,
+				Name:        "channel",
+				Description: "The channel that you want to remove from the list of approved channels.",
+				Required:    true,
+			},
+		},
+	},
+	{
+		Name:                     "chat_get_chance",
+		Description:              "This command checks the chat response chance.",
+		DefaultMemberPermissions: &defaultMemberPermissions,
+	},
+	{
+		Name:                     "chat_set_chance",
+		Description:              "This command sets the chat response chance.",
+		DefaultMemberPermissions: &defaultMemberPermissions,
+
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionNumber,
+				Name:        "percentage",
+				Description: "This value is the chance that Shem-Ha will respond to a message, must be between 0 and 100.",
+				Required:    true,
+				MinValue:    &minChanceValue,
+				MaxValue:    maxChanceValue,
+			},
+		},
+	},
+
 	//{
 	//	Name:                     "list_channels",
 	//	Description:              "This command shows all the channels that Shem-Ha is allowed to chat in!",
