@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"os/signal"
 	"regexp"
+	"syscall"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -66,9 +69,34 @@ func main() {
 		DBName: mySQLParameters.Database,
 	}
 
-	// Open a connection to the discord_messages database.
+	// Open a connection to the database.
 	db, err = sql.Open("mysql", configuration.FormatDSN())
 	if err != nil {
-		log.Println(err)
+		log.Fatal("ERROR OPENING DATABASE CONNECTION: ", err)
 	}
+
+	// Create a new Discord session using the provided bot token.
+	session, err := discordgo.New("Bot " + tokens.DiscordToken)
+	if err != nil {
+		log.Fatal("ERROR CREATING DISCORD SESSION: ", err)
+	}
+
+	// Identify we want all intents.
+	session.Identify.Intents = discordgo.IntentsAll
+
+	// Now we open a websocket connection to Discord and begin listening.
+	err = session.Open()
+	if err != nil {
+		log.Fatal("ERROR OPENING WEBSOCKET: ", err)
+	}
+
+	// Wait here until CTRL-C or other term signal is received.
+	log.Println("Bot is now running.  Press CTRL-C to exit.")
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+	<-sc
+
+	// Cleanly close the Discord session.
+	session.Close()
+
 }
