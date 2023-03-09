@@ -98,5 +98,4 @@ func main() {
 
 	// Cleanly close the Discord session.
 	session.Close()
-
 }
