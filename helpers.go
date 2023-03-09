@@ -95,6 +95,50 @@ func getGuildChatChance(guildID string) float64 {
 	}
 }
 
+func getGuildChatLength(guildID string) int {
+	var length int
+
+	// Performa a single row query to check if the guild chat respone chance.
+	query := fmt.Sprintf(`SELECT chat_length from servers WHERE server_id = %v`, guildID)
+	err := db.QueryRow(query).Scan(&length)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
+		return 0
+	}
+
+	if err == sql.ErrNoRows {
+		return 0
+	} else {
+		return length
+	}
+}
+
+func chatGetChannels(guildID string) []string {
+	query := fmt.Sprintf(`SELECT * FROM channels WHERE server_id = %v;`, guildID)
+
+	rows, err := db.Query(query)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY CHANNELS:\n\t%v", Red, Reset, err)
+		return []string{}
+	}
+
+	// Getting the list of channel IDs that she is allowed to respond in.
+	var channelIDs []string
+	var channelID string
+	var serverID string
+	for rows.Next() {
+		err := rows.Scan(&serverID, &channelID)
+		if err != nil {
+			log.Printf("%vERROR%v - COULD NOT RETRIEVE CHANNEL FROM ROW:\n\t%v", Red, Reset, err)
+			continue
+		}
+
+		channelIDs = append(channelIDs, channelID)
+	}
+
+	return channelIDs
+}
+
 // Function to check if a string is in an array, returns true or false.
 func inArray(str string, list []string) bool {
 	for _, i := range list {

@@ -16,7 +16,7 @@ import (
 // Creating a struct to hold the Discord and OpenAI Token held within tokens.json.
 type Tokens struct {
 	DiscordToken string
-	GPT3Token    string
+	OpenAIToken  string
 }
 
 // Making a struct to hold the MySQL server logon parameters.
@@ -90,19 +90,19 @@ func main() {
 		log.Fatal("ERROR OPENING WEBSOCKET: ", err)
 	}
 
-	// // Making a map of registered commands.
-	registeredCommands := make([]*discordgo.ApplicationCommand, len(commandMap))
-
-	// Looping through the commands array and registering them.
-	// https://pkg.go.dev/github.com/bwmarrin/discordgo#Session.ApplicationCommandCreate
-	for i, command := range commandMap {
-		registeredCommand, err := session.ApplicationCommandCreate(session.State.User.ID, "1083175428073738432", command)
-		if err != nil {
-			log.Printf("CANNOT CREATE '%v' COMMAND: %v", command.Name, err)
-		}
-
-		registeredCommands[i] = registeredCommand
-	}
+	//// Making a map of registered commands.
+	//registeredCommands := make([]*discordgo.ApplicationCommand, len(commandMap))
+	//
+	//// Looping through the commands array and registering them.
+	//// https://pkg.go.dev/github.com/bwmarrin/discordgo#Session.ApplicationCommandCreate
+	//for i, command := range commandMap {
+	//	registeredCommand, err := session.ApplicationCommandCreate(session.State.User.ID, "1083175428073738432", command)
+	//	if err != nil {
+	//		log.Printf("CANNOT CREATE '%v' COMMAND: %v", command.Name, err)
+	//	}
+	//
+	//	registeredCommands[i] = registeredCommand
+	//}
 
 	// Looping through the array of interaction handlers and adding them to the session.
 	session.AddHandler(func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
@@ -110,6 +110,8 @@ func main() {
 			handler(session, interaction)
 		}
 	})
+
+	session.AddHandler(messageCreate)
 
 	// Wait here until CTRL-C or other term signal is received.
 	log.Println("Bot is now running.  Press CTRL-C to exit.")

@@ -311,7 +311,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 			session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("Ran into an error, please check try again later!"),
+					Content: fmt.Sprintf("Ran into an error, please try again later!"),
 				},
 			})
 		}
@@ -321,6 +321,42 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: fmt.Sprintf("Successfully updated the response chance. The reponse chance is now %v percent.", chance),
+			},
+		})
+	},
+	"chat_get_length": func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+		// Responding to the interaction.
+		session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("The current response chance is %v tokens.",
+					getGuildChatLength(interaction.GuildID)),
+			},
+		})
+	},
+	"chat_set_length": func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
+		tokens := interaction.ApplicationCommandData().Options[0].IntValue()
+
+		// Creating a single row query to set the chance of the chat response chance.
+		query := fmt.Sprintf(`UPDATE servers SET chat_length = %v WHERE server_id = %v`, tokens, interaction.GuildID)
+		_, err := db.Query(query)
+		if err != nil {
+			log.Printf("%vERROR%v - COULD NOT QUERY SERVERS: %v", Red, Reset, err)
+
+			// Responding to the interaction.
+			session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: fmt.Sprintf("Ran into an error, please try again later!"),
+				},
+			})
+		}
+
+		// Responding to the interaction.
+		session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("Successfully updated the response length. The reponse length is now %v tokens.", tokens),
 			},
 		})
 	},
