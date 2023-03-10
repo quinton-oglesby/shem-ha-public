@@ -74,7 +74,7 @@ func messageCreateMarkov(session *discordgo.Session, message *discordgo.MessageC
 		chain.Build(strings.NewReader(content))
 
 		// Generate the chain.
-		content_chain := chain.Generate(32)
+		contentChain := chain.Generate(32)
 		if err != nil {
 			log.Println(err)
 		}
@@ -86,12 +86,12 @@ func messageCreateMarkov(session *discordgo.Session, message *discordgo.MessageC
 		}
 
 		if getOwO(message.GuildID) {
-			content_chain = OwO.WhatsThis(content_chain)
+			contentChain = OwO.WhatsThis(contentChain)
 		}
 
 		// Setting the parameters for the webhook that will mimic the user.
 		params := discordgo.WebhookParams{}
-		params.Content = content_chain
+		params.Content = contentChain
 		params.Username = message.Author.Username
 		params.AvatarURL = message.Author.AvatarURL(message.Author.Avatar)
 
