@@ -22,7 +22,7 @@ var (
 // Function to check whether a guild is already set up.
 func guildIsSetup(guildID string) bool {
 	var id int64
-	// Perform a single row query to check if the guild is setup.
+	// Perform a single row query to check if the guild is set up.
 	query := fmt.Sprintf(`SELECT server_id FROM servers WHERE server_id= %v`, guildID)
 	err := db.QueryRow(query).Scan(&id)
 	if err != nil && err != sql.ErrNoRows {
@@ -37,7 +37,47 @@ func guildIsSetup(guildID string) bool {
 	}
 }
 
-func chatGetChannels(guildID string) []string {
+func guidIsExempt(guildID string) bool {
+	var exempt int
+
+	// Perform a single row query to check if the guild is exempt from paying.
+	query := fmt.Sprintf(`SELECT exempt from servers WHERE server_id = %v`, guildID)
+	err := db.QueryRow(query).Scan(&exempt)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
+		return false
+	}
+
+	if err == sql.ErrNoRows {
+		return false
+	} else if exempt == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
+func guildIsPaid(guildID string) bool {
+	var paid int
+
+	// Perform a single row query to check if the guild is exempt from paying.
+	query := fmt.Sprintf(`SELECT paid from servers WHERE server_id = %v`, guildID)
+	err := db.QueryRow(query).Scan(&paid)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
+		return false
+	}
+
+	if err == sql.ErrNoRows {
+		return false
+	} else if paid == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
+func getGuildChatChannels(guildID string) []string {
 	query := fmt.Sprintf(`SELECT * FROM chat_channels WHERE server_id = %v;`, guildID)
 
 	rows, err := db.Query(query)
@@ -63,50 +103,10 @@ func chatGetChannels(guildID string) []string {
 	return channelIDs
 }
 
-func guidIsExempt(guildID string) bool {
-	var exempt int
-
-	// Performa a single row query to check if the guild is exempt from paying.
-	query := fmt.Sprintf(`SELECT exempt from servers WHERE server_id = %v`, guildID)
-	err := db.QueryRow(query).Scan(&exempt)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
-		return false
-	}
-
-	if err == sql.ErrNoRows {
-		return false
-	} else if exempt == 0 {
-		return false
-	} else {
-		return true
-	}
-}
-
-func guildIsPaid(guildID string) bool {
-	var paid int
-
-	// Performa a single row query to check if the guild is exempt from paying.
-	query := fmt.Sprintf(`SELECT paid from servers WHERE server_id = %v`, guildID)
-	err := db.QueryRow(query).Scan(&paid)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
-		return false
-	}
-
-	if err == sql.ErrNoRows {
-		return false
-	} else if paid == 0 {
-		return false
-	} else {
-		return true
-	}
-}
-
 func getGuildChatChance(guildID string) float64 {
 	var chance float64
 
-	// Performa a single row query to check if the guild chat respone chance.
+	// Perform a single row query to check if the guild chat response chance.
 	query := fmt.Sprintf(`SELECT chat_chance from servers WHERE server_id = %v`, guildID)
 	err := db.QueryRow(query).Scan(&chance)
 	if err != nil && err != sql.ErrNoRows {
@@ -124,7 +124,7 @@ func getGuildChatChance(guildID string) float64 {
 func getGuildChatLength(guildID string) int {
 	var length int
 
-	// Performa a single row query to check if the guild chat respone chance.
+	// Perform a single row query to check if the guild chat response chance.
 	query := fmt.Sprintf(`SELECT chat_length from servers WHERE server_id = %v`, guildID)
 	err := db.QueryRow(query).Scan(&length)
 	if err != nil && err != sql.ErrNoRows {
@@ -136,6 +136,71 @@ func getGuildChatLength(guildID string) int {
 		return 0
 	} else {
 		return length
+	}
+}
+
+func getGuildMarkovChannels(guildID string) []string {
+	query := fmt.Sprintf(`SELECT * FROM markov_channels WHERE server_id = %v;`, guildID)
+
+	rows, err := db.Query(query)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY CHANNELS:\n\t%v", Red, Reset, err)
+		return []string{}
+	}
+
+	// Getting the list of channel IDs that she is allowed to respond in.
+	var channelIDs []string
+	var channelID string
+	var serverID string
+	for rows.Next() {
+		err := rows.Scan(&serverID, &channelID)
+		if err != nil {
+			log.Printf("%vERROR%v - COULD NOT RETRIEVE CHANNEL FROM ROW:\n\t%v", Red, Reset, err)
+			continue
+		}
+
+		channelIDs = append(channelIDs, channelID)
+	}
+
+	return channelIDs
+}
+
+func getGuildMarkovChance(guildID string) float64 {
+	var chance float64
+
+	// Perform a single row query to check if the guild chat response chance.
+	query := fmt.Sprintf(`SELECT markov_frequency from servers WHERE server_id = %v`, guildID)
+	err := db.QueryRow(query).Scan(&chance)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
+		return 0
+	}
+
+	if err == sql.ErrNoRows {
+		return 0
+	} else {
+		return chance
+	}
+}
+
+func getOwO(guildID string) bool {
+	var chance float64
+
+	// Perform a single row query to check if the guild chat response chance.
+	query := fmt.Sprintf(`SELECT markov_owo from servers WHERE server_id = %v`, guildID)
+	err := db.QueryRow(query).Scan(&chance)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
+		return false
+	}
+
+	switch chance {
+	default:
+		return false
+	case 0:
+		return false
+	case 1:
+		return true
 	}
 }
 

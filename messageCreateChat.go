@@ -5,26 +5,15 @@ import (
 	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sashabaranov/go-openai"
+	"github.com/varsapphire/OwO"
 	"log"
 	"math/rand"
 	"time"
 )
 
 func messageCreateChat(session *discordgo.Session, message *discordgo.MessageCreate) {
-	//// Check if the chatting is enabled in the server.
-	//var chatEnabled int
-	//query := fmt.Sprintf(`SELECT chat_enabled FROM servers WHERE server_id = %v`, message.GuildID)
-	//err := db.QueryRow(query).Scan(&chatEnabled)
-	//if err != nil {
-	//	log.Printf("%vERROR%v - COULD NOT QUERY SERVERS:\n\t%v", Red, Reset, err)
-	//	return
-	//}
-	//
-	//if chatEnabled == 0 {
-	//	return
-	//}
 	// Check if bot is allowed to respond in the channel.
-	if !inArray(message.ChannelID, chatGetChannels(message.GuildID)) {
+	if !inArray(message.ChannelID, getGuildChatChannels(message.GuildID)) {
 		return
 	}
 
@@ -83,9 +72,14 @@ func messageCreateChat(session *discordgo.Session, message *discordgo.MessageCre
 			},
 		)
 
+		contentChain := res.Choices[0].Message.Content
+		if getOwO(message.GuildID) {
+			contentChain = OwO.WhatsThis(contentChain)
+		}
+
 		// https://pkg.go.dev/github.com/bwmarrin/discordgo#Session.ChannelMessageSendComplex
 		_, err := session.ChannelMessageSendComplex(message.ChannelID, &discordgo.MessageSend{
-			Content: res.Choices[0].Message.Content,
+			Content: contentChain,
 			//Reference: message.Reference(),
 			//AllowedMentions: &discordgo.MessageAllowedMentions{
 			//	Parse: nil,

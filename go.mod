@@ -6,6 +6,7 @@ require (
 	github.com/bwmarrin/discordgo v0.27.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/sashabaranov/go-openai v1.5.0
+	github.com/varsapphire/OwO v0.2.0
 )
 
 require (
