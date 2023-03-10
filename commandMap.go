@@ -11,7 +11,7 @@ var maxChanceValue float64 = 100
 
 // Declaring the max value allowed for a response.
 var minLengthValue float64 = 64
-var maxLengthValue float64 = 1024
+var maxLengthValue float64 = 512
 
 var commandMap = []*discordgo.ApplicationCommand{
 	{

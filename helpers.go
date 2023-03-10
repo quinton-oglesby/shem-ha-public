@@ -37,6 +37,32 @@ func guildIsSetup(guildID string) bool {
 	}
 }
 
+func chatGetChannels(guildID string) []string {
+	query := fmt.Sprintf(`SELECT * FROM chat_channels WHERE server_id = %v;`, guildID)
+
+	rows, err := db.Query(query)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("%vERROR%v - COULD NOT QUERY CHANNELS:\n\t%v", Red, Reset, err)
+		return []string{}
+	}
+
+	// Getting the list of channel IDs that she is allowed to respond in.
+	var channelIDs []string
+	var channelID string
+	var serverID string
+	for rows.Next() {
+		err := rows.Scan(&serverID, &channelID)
+		if err != nil {
+			log.Printf("%vERROR%v - COULD NOT RETRIEVE CHANNEL FROM ROW:\n\t%v", Red, Reset, err)
+			continue
+		}
+
+		channelIDs = append(channelIDs, channelID)
+	}
+
+	return channelIDs
+}
+
 func guidIsExempt(guildID string) bool {
 	var exempt int
 
@@ -111,32 +137,6 @@ func getGuildChatLength(guildID string) int {
 	} else {
 		return length
 	}
-}
-
-func chatGetChannels(guildID string) []string {
-	query := fmt.Sprintf(`SELECT * FROM channels WHERE server_id = %v;`, guildID)
-
-	rows, err := db.Query(query)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("%vERROR%v - COULD NOT QUERY CHANNELS:\n\t%v", Red, Reset, err)
-		return []string{}
-	}
-
-	// Getting the list of channel IDs that she is allowed to respond in.
-	var channelIDs []string
-	var channelID string
-	var serverID string
-	for rows.Next() {
-		err := rows.Scan(&serverID, &channelID)
-		if err != nil {
-			log.Printf("%vERROR%v - COULD NOT RETRIEVE CHANNEL FROM ROW:\n\t%v", Red, Reset, err)
-			continue
-		}
-
-		channelIDs = append(channelIDs, channelID)
-	}
-
-	return channelIDs
 }
 
 // Function to check if a string is in an array, returns true or false.

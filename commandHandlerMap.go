@@ -11,17 +11,6 @@ import (
 // https://pkg.go.dev/github.com/bwmarrin/discordgo#EventHandler
 var commandHandlers = map[string]func(session *discordgo.Session, interaction *discordgo.InteractionCreate){
 	"echo": func(session *discordgo.Session, interaction *discordgo.InteractionCreate) {
-		if !guildIsSetup(interaction.GuildID) {
-			//https://pkg.go.dev/github.com/bwmarrin/discordgo#Session.InteractionRespond
-			session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "You need to run /setup first!",
-				},
-			})
-			return
-		}
-
 		// Grabbing the channel ID and the content of the message to echo.
 		channel := interaction.ApplicationCommandData().Options[0].ChannelValue(session)
 		content := interaction.ApplicationCommandData().Options[1].StringValue()
@@ -63,7 +52,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 			// Creating and executing a SQL query to set up.
 			query = fmt.Sprintf(
 				`INSERT INTO servers(server_id, exempt, paid, chat_enabled, frame_enabled, markov_enabled, chat_chance, chat_length, chat_limit, frame_frequency, markov_frequency, markov_owo)
-					  VALUES(%v, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)`,
+					  VALUES(%v, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)`,
 				interaction.GuildID)
 
 			_, err = db.Exec(query)
@@ -93,7 +82,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 		session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "All set up!",
+				Content: "You're all set up!\n\nPlease consider setting up a monthly donation of $5 or more as Shem-Ha's chat function does cost money out of my own pocket to run. \n\nhttps://ko-fi.com/variableformation",
 			},
 		})
 	},
@@ -118,7 +107,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 			session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "I am not allowed to respond in any channels currently!",
+					Content: "I am not allowed to save from or respond in any channels currently!",
 				},
 			})
 		default:
@@ -152,7 +141,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 				response += fmt.Sprintln("\t<#" + chid + ">")
 			}
 
-			response = fmt.Sprintln("I am allowed to respond in the following channel(s):\n", response)
+			response = fmt.Sprintln("I am allowed to save messages and respond in the following channel(s):\n", response)
 			log.Println(response)
 
 			// Finally, responding to the interaction.
@@ -214,7 +203,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 			session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("Successfully added <#%v> to the list of channels I am allowed to respond in.", channelID),
+					Content: fmt.Sprintf("Successfully added <#%v> to the list of channels I am allowed to gather data from and respond in.", channelID),
 				},
 			})
 		} else {
@@ -283,7 +272,7 @@ var commandHandlers = map[string]func(session *discordgo.Session, interaction *d
 			session.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("Successfully removed <#%v> from the list of channels I am allowed to respond in.", channelID),
+					Content: fmt.Sprintf("Successfully removed <#%v> from the list of channels I am allowed to save data from and respond in.", channelID),
 				},
 			})
 		}

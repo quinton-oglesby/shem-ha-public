@@ -96,7 +96,7 @@ func main() {
 	//// Looping through the commands array and registering them.
 	//// https://pkg.go.dev/github.com/bwmarrin/discordgo#Session.ApplicationCommandCreate
 	//for i, command := range commandMap {
-	//	registeredCommand, err := session.ApplicationCommandCreate(session.State.User.ID, "1083175428073738432", command)
+	//	registeredCommand, err := session.ApplicationCommandCreate(session.State.User.ID, "", command)
 	//	if err != nil {
 	//		log.Printf("CANNOT CREATE '%v' COMMAND: %v", command.Name, err)
 	//	}
@@ -111,7 +111,8 @@ func main() {
 		}
 	})
 
-	session.AddHandler(messageCreate)
+	session.AddHandler(messageCreateChat)
+	session.AddHandler(messageCreateMarkov)
 
 	// Wait here until CTRL-C or other term signal is received.
 	log.Println("Bot is now running.  Press CTRL-C to exit.")
