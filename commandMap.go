@@ -117,60 +117,6 @@ var commandMap = []*discordgo.ApplicationCommand{
 		},
 	},
 	{
-		Name:                     "markov_list_channels",
-		Description:              "This command will list the channels Shem-Ha is allowed to generate a markov chain in.",
-		DefaultMemberPermissions: &defaultMemberPermissions,
-	},
-	{
-		Name:                     "markov_add_channel",
-		Description:              "This command will add the list of channels Shem-Ha is allowed to make a markov chain in.",
-		DefaultMemberPermissions: &defaultMemberPermissions,
-
-		Options: []*discordgo.ApplicationCommandOption{
-			{
-				Type:        discordgo.ApplicationCommandOptionChannel,
-				Name:        "channel",
-				Description: "The channel that you want to add to the list of approved channels.",
-				Required:    true,
-			},
-		},
-	},
-	{
-		Name:                     "markov_remove_channel",
-		Description:              "This command will remove from the list of channels Shem-Ha is allowed to make a markov chain in.",
-		DefaultMemberPermissions: &defaultMemberPermissions,
-
-		Options: []*discordgo.ApplicationCommandOption{
-			{
-				Type:        discordgo.ApplicationCommandOptionChannel,
-				Name:        "channel",
-				Description: "The channel that you want to remove from the list of approved channels.",
-				Required:    true,
-			},
-		},
-	},
-	{
-		Name:                     "markov_get_chance",
-		Description:              "This command will get the chance of Shem-Ha generating a markov chain.",
-		DefaultMemberPermissions: &defaultMemberPermissions,
-	},
-	{
-		Name:                     "markov_set_chance",
-		Description:              "This command sets the chain generation chance.",
-		DefaultMemberPermissions: &defaultMemberPermissions,
-
-		Options: []*discordgo.ApplicationCommandOption{
-			{
-				Type:        discordgo.ApplicationCommandOptionNumber,
-				Name:        "percentage",
-				Description: "This value is the chance that Shem-Ha will respond generate a chain, must be between 0 and 100.",
-				Required:    true,
-				MinValue:    &minChanceValue,
-				MaxValue:    maxChanceValue,
-			},
-		},
-	},
-	{
 		Name:                     "owo",
 		Description:              "OwO what's this?",
 		DefaultMemberPermissions: &defaultMemberPermissions,

@@ -112,7 +112,6 @@ func main() {
 	})
 
 	session.AddHandler(messageCreateChat)
-	session.AddHandler(messageCreateMarkov)
 
 	// Wait here until CTRL-C or other term signal is received.
 	log.Println("Bot is now running.  Press CTRL-C to exit.")
